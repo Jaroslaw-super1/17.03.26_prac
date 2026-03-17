@@ -1,12 +1,14 @@
 #ifndef TOP_IT_VECTOR_HPP
 #define TOP_IT_VECTOR_HPP
 
+#include <iostream>
+
 namespace topit
 {
   template< class T >
   struct Vector
   {
-    
+
 
    private:
     T * data_;
