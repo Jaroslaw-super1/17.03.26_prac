@@ -14,6 +14,7 @@ namespace topit
     Vector< T > & operator=(const Vector< T > &) = delete;
 
     bool isEmpety() const noexcept;
+    void pushBack(const T &) {size_++;}
 
    private:
     T * data_;
@@ -24,7 +25,7 @@ namespace topit
 template< class T >
 bool topit::Vector< T >::isEmpety() const noexcept
 {
-  return true;
+  return !size_;
 }
 
 template< class T >
