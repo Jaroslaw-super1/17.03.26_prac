@@ -15,7 +15,7 @@ bool testVectorWithValue()
   return !v.isEmpety();
 }
 
-bool testCopyConstruct() // !!!!!!!!!!!!!!!!!!!!
+bool testCopyConstruct()
 {
   topit::Vector< int > v;
   v.pushBack(1);
@@ -36,6 +36,37 @@ bool testElementAssert()
   return v[0] == 1 && v[1] == 2;
 }
 
+
+bool testPushFront()
+{
+  topit::Vector< int > v;
+  v.pushFront(10);
+  v.pushFront(20);
+  v.pushFront(30);
+  return v.getSize() == 3 && v[0] == 30 && v[1] == 20 && v[2] == 10;
+}
+
+bool testPopFront()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.popFront();
+  return v.getSize() == 2 && v[0] == 2 && v[1] == 3;
+}
+
+bool testPopBack()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.popBack();
+  return v.getSize() == 2 && v[0] == 1 && v[1] == 2;
+}
+
+
 int main()
 {
   using test_t = bool(*)();
@@ -46,7 +77,11 @@ int main()
     {"Vector with any value is not empety", testVectorWithValue}
     {"3 ", testCopyConstruct},
     {"4 ", testElementAssert},
+    {"Push front", testPushFront},
+    {"Pop front", testPopFront},
+    {"Pop back", testPopBack}
   };
+
   const size_t count = sizeof(tests) / sizeof(pair_t);
   std::cout << std::boolalpha;
   bool pass = true;
