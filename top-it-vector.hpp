@@ -40,6 +40,70 @@ namespace topit
 }
 
 template< class T >
+void Vector< T >::pushBack(const T & value)
+{
+  if (size_ == capacity_)
+  {
+    size_t new_cap = (capacity_ == 0) ? 1 : capacity_ * 2;
+    T * new_data = new T[new_cap];
+    for (size_t i = 0; i < size_; ++i)
+    {
+      new_data[i] = data_[i];
+    }
+    delete[] data_;
+    data_ = new_data;
+    capacity_ = new_cap;
+  }
+  data_[size_] = value;
+  ++size_;
+}
+
+template< class T >
+void Vector< T >::popBack()
+{
+  assert(!isEmpty());
+  --size_;
+}
+
+template< class T >
+void Vector< T >::pushFront(const T & value)
+{
+  if (size_ == capacity_)
+  {
+    size_t new_cap = (capacity_ == 0) ? 1 : capacity_ * 2;
+    T * new_data = new T[new_cap];
+    for (size_t i = 0; i < size_; ++i)
+    {
+      new_data[i + 1] = data_[i];
+    }
+    delete[] data_;
+    data_ = new_data;
+    capacity_ = new_cap;
+  }
+  else
+  {
+    for (size_t i = size_; i > 0; --i)
+    {
+      data_[i] = data_[i - 1];
+    }
+  }
+  data_[0] = value;
+  ++size_;
+}
+
+template< class T >
+void Vector< T >::popFront()
+{
+  assert(!isEmpty());
+  for (size_t i = 1; i < size_; ++i)
+  {
+    data_[i - 1] = data_[i];
+  }
+  --size_;
+}
+
+
+template< class T >
 void topit::Vector< T >::pushFront(const T &)
 {
   Vector< T > cpy(val.getSize() + 1);
@@ -76,17 +140,11 @@ topit::Vector< T >::Vector(size_t k):
   size_(k),
   capacity_(k)
 {
-  try {
-    for (size_t i = 0; i < getSize(); i++)
-    {
-      data_[i] = rhs[i];
-    }
-  } catch (...)
+  for (size_t i = 0; i < getSize(); i++)
   {
-
+    data_[i] = rhs[i];
   }
 }
-
 
 template< class T >
 topit::Vector< T >::Vector< T >(const Vector< T > & rhs):
