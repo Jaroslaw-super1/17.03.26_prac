@@ -24,6 +24,9 @@ namespace topit
     T & operator[](size_t id) noexcept;
     const T & operator[](size_t id) const noexcept;
 
+    T & at(size_t id);
+    const T & at(size_t id) const;
+
     Vector< T > & operator=(const Vector< T > & rhs);
     Vector< T > & operator=(Vector< T > &&) noexcept;
 
@@ -33,12 +36,45 @@ namespace topit
     void pushFront(const T &);
     void popFront();
 
+    // Классная работа
+    // с идиомой копи и свап
+    void insert(size_t i, const T & val);
+    void erase(size_t i);
+    void insert(size_t i, const Vector< T > & rhs, size_t beg, size_t end);
+    void erase(size_t beg, size_t end);
+
+    // Дз
+    // 1 реализовать итераторы
+    // 2 придумать ещё 3 инсёрта и эрейза но с итераторами
+    // 3 протестировать
+    template <свой итератор, FwdIteretor>
+    void insert(свой итератор pos, FwdIteretor beg, FwdIteretor end);
+
+
    private:
     T * data_;
     size_t size_, capacity_;
 
     explicit Vector(size_t k);
   };
+}
+
+template< class T >
+T & topit::Vector< T >::at(size_t id)
+{
+  const Vector< T > * cthis = this;
+  const T & ret = cthis->at(id);
+  return const_cast< T & >(ret);
+}
+
+template< class T >
+const T & at(size_t id) const
+{
+  if (id < getSize())
+  {
+    return data_[id];
+  }
+  throw std::range_error("bad id");
 }
 
 template< class T >

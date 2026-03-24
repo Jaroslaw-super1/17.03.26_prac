@@ -66,6 +66,17 @@ bool testPopBack()
   return v.getSize() == 2 && v[0] == 1 && v[1] == 2;
 }
 
+bool testElementCheckedAccess()
+{
+  topit::Vector< int > v;
+  try {
+    v.at(0);
+    return false;
+  } catch (...)
+  {
+    return true;
+  }
+}
 
 int main()
 {
