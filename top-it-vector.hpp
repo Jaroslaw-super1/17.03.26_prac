@@ -20,6 +20,7 @@ namespace topit
     bool isEmpety() const noexcept;
     size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
+    void reserve(size_t k);
 
     T & operator[](size_t id) noexcept;
     const T & operator[](size_t id) const noexcept;
@@ -29,6 +30,13 @@ namespace topit
 
     Vector< T > & operator=(const Vector< T > & rhs);
     Vector< T > & operator=(Vector< T > &&) noexcept;
+
+    void pushBackRange(IT begin, size_t k);
+    // знаем сколько вставить
+    // выделяем память
+    // вызываем pushBackImpl без проверки
+    void pushBackImpl(const T &);
+    // вставка без проверки на ёмкость
 
     void pushBack(const T &);
     void popBack();
@@ -56,7 +64,38 @@ namespace topit
     size_t size_, capacity_;
 
     explicit Vector(size_t k);
+
+
+    // классная работа
+    void reserve(size_t pos, size_t k);
+
   };
+}
+
+template< class T >
+void topit::Vector< T >::reserve(size_t k)
+{
+  if (capacity_ >= cap)
+  {
+    return;
+  }
+  T * d = new T[cap];
+
+  try
+  {
+    for (size_t i = 0; i < getSize(); i++)
+    {
+      d[i] = std::move(data_[i]);
+    }
+  }
+  catch(...)
+  {
+    delete[] d;
+    throw;
+  }
+  delete[] data_;
+  data_ = d;
+  capacity_ = cap;
 }
 
 template< class T >
