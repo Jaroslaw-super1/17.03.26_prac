@@ -6,25 +6,6 @@
 
 namespace topit
 {
-  template < class T >
-  struct VIter
-  {
-    explicit VIter(Vector< T > & v, size_t pos);
-    bool operator==(const VIter< T > &) const noexcept;
-    bool operator!=(const VIter< T > &) const noexcept;
-    VIter< T > & operator++() noexcept;
-    VIter< T > & operator--() noexcept;
-    VIter< T > operator+(size_t i) noexcept;
-    VIter< T > operator-(size_t i) noexcept;
-    T & operator*();
-
-  private:
-    Vector< T > & v_;
-    size_t pos_;
-    friend class Vector< T >;
-  };
-
-
   template< class T >
   struct Vector
   {
@@ -33,6 +14,9 @@ namespace topit
     ~Vector();
     Vector(Vector< T > &&) noexcept;
     Vector(std::initializer_list< T > il);
+
+    VIter< T > begin();
+    VIter< T > end();
 
     void swap(Vector< T > & rhs) noexcept;
 
@@ -53,9 +37,7 @@ namespace topit
     void pushBackRange(IT begin, size_t k);
     // знаем сколько вставить
     // выделяем память
-    // вызываем pushBackImpl без проверки
-    void pushBackImpl(const T &);
-    // вставка без проверки на ёмкость
+    // вызываем pushBackImpl
 
     void pushBack(const T &);
     void popBack();
@@ -71,11 +53,8 @@ namespace topit
     void erase(size_t beg, size_t end);
 
     // Дз
-    // 1 реализовать итераторы
-    // 2 придумать ещё 3 инсёрта и эрейза но с итераторами
-    // 3 протестировать
-    template <свой итератор, FwdIteretor>
-    void insert(свой итератор pos, FwdIteretor beg, FwdIteretor end);
+    template < class FwdIteretor >
+    void insert(VIter< T > pos, FwdIteretor beg, FwdIteretor end);
 
 
    private:
@@ -84,12 +63,90 @@ namespace topit
 
     explicit Vector(size_t k);
 
-
+    void pushBackImpl(const T &);
+    // вставка без проверки на ёмкость
     // классная работа
     void reserve(size_t pos, size_t k);
+  };
 
+
+  template < class T >
+  struct VIter
+  {
+    explicit VIter(Vector< T > & v, size_t pos);
+    bool operator==(const VIter< T > &) const noexcept;
+    bool operator!=(const VIter< T > &) const noexcept;
+    VIter< T > & operator++() noexcept;
+    VIter< T > & operator--() noexcept;
+    VIter< T > operator+(size_t i) noexcept;
+    VIter< T > operator-(size_t i) noexcept;
+    T & operator*();
+
+  private:
+    Vector< T > & v_;
+    size_t pos_;
+    friend class Vector< T >;
   };
 }
+
+
+
+
+template < class T >
+topit::VIter< T >::VIter(Vector< T > & v, size_t pos):
+  v_(v),
+  pos_(pos)
+{}
+
+template< class T >
+bool topit::VIter< T >::operator==(const VIter< T > & other) const noexcept
+{
+  return & v_ == & other.v_ && pos_ == other.pos_;
+}
+
+template< class T >
+bool topit::VIter< T >::operator!=(const VIter< T > & other) const noexcept
+{
+  return !(*this == other);
+}
+
+template< class T >
+topit::VIter< T > & topit::VIter< T >::operator++() noexcept
+{
+  ++pos_;
+  return *this;
+}
+
+template< class T >
+topit::VIter< T > & topit::VIter< T >::operator--() noexcept
+{
+  --pos_;
+  return *this;
+}
+
+template< class T >
+topit::VIter< T > topit::VIter< T >::operator+(size_t i) noexcept
+{
+  return VIter(v_, pos_ + i);
+}
+
+template< class T >
+topit::VIter< T > topit::VIter< T >::operator-(size_t i) noexcept
+{
+  return VIter(v_, pos_ - i);
+}
+
+template< class T >
+T & topit::VIter< T >::operator*()
+{
+  return v_[pos_];
+}
+
+
+
+
+
+
 
 template< class T >
 void topit::Vector< T >::reserve(size_t k)
