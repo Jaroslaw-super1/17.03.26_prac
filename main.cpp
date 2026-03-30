@@ -78,6 +78,12 @@ bool testElementCheckedAccess()
   }
 }
 
+bool testInicializerListConstruct()
+{
+  topit::Vector< int > v{1, 2};
+  return v.getSize() == 2;
+}
+
 int main()
 {
   using test_t = bool(*)();
@@ -85,12 +91,13 @@ int main()
   pair_t tests[] =
   {
     {"Default vector is empety", testDefaultVector},
-    {"Vector with any value is not empety", testVectorWithValue}
+    {"Vector with any value is not empety", testVectorWithValue},
     {"3 ", testCopyConstruct},
     {"4 ", testElementAssert},
     {"Push front", testPushFront},
     {"Pop front", testPopFront},
-    {"Pop back", testPopBack}
+    {"Pop back", testPopBack},
+    {"Inicializer List", testInicializerListConstruct},
   };
 
   const size_t count = sizeof(tests) / sizeof(pair_t);

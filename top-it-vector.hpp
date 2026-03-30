@@ -10,9 +10,10 @@ namespace topit
   struct Vector
   {
     Vector();
-    Vector(const Vector< T > &) = delete;
+    Vector(const Vector< T > &);
     ~Vector();
     Vector(Vector< T > &&) noexcept;
+    Vector(std::initializer_list< T > il);
 
     void swap(Vector< T > & rhs) noexcept;
 
@@ -56,6 +57,18 @@ namespace topit
 
     explicit Vector(size_t k);
   };
+}
+
+template< class T >
+topit::Vector< T >::Vector(std::initializer_list< T > il):
+  Vector(il.size())
+{
+  size_t i = 0;
+  for (auto && v: il)
+  {
+    data_[i++] = v;
+  }
+  
 }
 
 template< class T >
