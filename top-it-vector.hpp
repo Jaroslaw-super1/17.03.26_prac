@@ -34,6 +34,7 @@ namespace topit
     Vector< T > & operator=(const Vector< T > & rhs);
     Vector< T > & operator=(Vector< T > &&) noexcept;
 
+    template < class IT >
     void pushBackRange(IT begin, size_t k);
     // знаем сколько вставить
     // выделяем память
@@ -88,6 +89,158 @@ namespace topit
     friend class Vector< T >;
   };
 }
+
+
+
+
+
+template < class T >
+void topit::Vector< T >::pushBackImpl(const T & value)
+{
+  data_[size_] = value;
+  ++size_;
+}
+
+template < class T >
+void topit::Vector< T >::reserve(size_t pos, size_t k)
+{
+  size_t new_cap = std::max(capacity_, size_ + k);
+  if (new_cap == capacity_)
+  {
+    return;
+  }
+
+  T * new_data = new T[new_cap];
+  try
+  {
+    for (size_t i = 0; i < pos; ++i)
+    {
+      new_data[i] = std::move(data_[i]);
+    }
+
+    for (size_t i = pos; i < size_; ++i)
+    {
+      new_data[i + k] = std::move(data_[i]);
+    }
+  }
+  catch (...)
+  {
+    delete[] new_data;
+    throw;
+  }
+  delete[] data_;
+  data_ = new_data;
+  capacity_ = new_cap;
+}
+
+template < class T >
+void topit::Vector< T >::insert(size_t i, const T & val)
+{
+  assert(i <= size_);
+  if (size_ == capacity_)
+  {
+    reserve(capacity_ == 0 ? 1 : capacity_ * 2);
+  }
+
+  for (size_t j = size_; j > i; --j)
+  {
+    data_[j] = std::move(data_[j - 1]);
+  }
+  data_[i] = val;
+  ++size_;
+}
+
+template < class T >
+void topit::Vector< T >::erase(size_t i)
+{
+  assert(i < size_);
+  for (size_t j = i + 1; j < size_; ++j)
+  {
+    data_[j - 1] = std::move(data_[j]);
+  }
+  --size_;
+}
+
+template < class T >
+void topit::Vector< T >::insert(size_t i, const Vector< T > & rhs, size_t beg, size_t end)
+{
+  assert(i <= size_);
+  assert(beg <= end && end <= rhs.size_);
+  size_t count = end - beg;
+  if (size_ + count > capacity_)
+  {
+    reserve(std::max(capacity_ * 2, size_ + count));
+  }
+
+  for (size_t j = size_; j > i; --j)
+  {
+    data_[j + count - 1] = std::move(data_[j - 1]);
+  }
+
+  for (size_t j = 0; j < count; ++j)
+  {
+    data_[i + j] = rhs.data_[beg + j];
+  }
+  size_ += count;
+}
+
+template < class T >
+void topit::Vector< T >::erase(size_t beg, size_t end)
+{
+  assert(beg <= end && end <= size_);
+  size_t count = end - beg;
+  for (size_t i = end; i < size_; ++i)
+  {
+    data_[i - count] = std::move(data_[i]);
+  }
+  size_ -= count;
+}
+
+template < class T >
+template < class FwdIterator >
+void topit::Vector< T >::insert(VIter< T > pos, FwdIterator beg, FwdIterator end)
+{
+  size_t index = pos.pos_;
+  size_t count = std::distance(beg, end);
+  if (size_ + count > capacity_)
+  {
+    reserve(std::max(capacity_ * 2, size_ + count));
+  }
+
+  for (size_t j = size_; j > index; --j)
+  {
+    data_[j + count - 1] = std::move(data_[j - 1]);
+  }
+
+  for (size_t j = 0; j < count; ++j)
+  {
+    data_[index + j] = *beg++;
+  }
+  size_ += count;
+}
+
+
+
+
+
+
+
+
+template < class T >
+template < class IT >
+void topit::Vector< T >::pushBackRange(IT begin, size_t k)
+{
+  if (size_ + k > capacity_)
+  {
+    reserve(std::max(capacity_ * 2, size_ + k));
+  }
+
+  for (size_t i = 0; i < k; ++i)
+  {
+    pushBackImpl(*(begin + i));
+  }
+}
+
 
 
 
@@ -213,7 +366,6 @@ topit::Vector< T >::Vector(Vector< T > && rhs) noexcept :
   rhs.data_ = nullptr;
 }
 
-
 template< class T >
 topit::Vector< T > & topit::Vector<T>::operator=(Vector< T > &&) noexcept
 {
@@ -259,7 +411,6 @@ void topit::Vector< T >::popFront()
   --size_;
 }
 
-
 template< class T >
 void topit::Vector< T >::pushFront(const T &)
 {
@@ -280,7 +431,6 @@ void topit::Vector< T >::swap(Vector< T > & rhs) noexcept
   std::swap(cpy.size_, size_);
   std::swap(cpy.capacity_, capacity_);
 }
-
 
 template< class T >
 topit::Vector< T > & topit::Vector< T >::operator=(const Vector< T > & rhs)
