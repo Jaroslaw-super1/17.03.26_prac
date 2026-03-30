@@ -3,9 +3,16 @@
 
 #include <iostream>
 #include <cassert>
+#include <algorithm>
+#include <iterator>
+#include <stdexcept>
+#include <utility>
 
 namespace topit
 {
+  template <class T>
+  struct VIter;
+
   template< class T >
   struct Vector
   {
@@ -54,8 +61,8 @@ namespace topit
     void erase(size_t beg, size_t end);
 
     // Дз
-    template < class FwdIteretor >
-    void insert(VIter< T > pos, FwdIteretor beg, FwdIteretor end);
+    template < class FwdIterator >
+    void insert(VIter< T > pos, FwdIterator beg, FwdIterator end);
 
 
    private:
@@ -222,10 +229,6 @@ void topit::Vector< T >::insert(VIter< T > pos, FwdIterator beg, FwdIterator end
 
 
 
-
-
-
-
 template < class T >
 template < class IT >
 void topit::Vector< T >::pushBackRange(IT begin, size_t k)
@@ -304,11 +307,11 @@ T & topit::VIter< T >::operator*()
 template< class T >
 void topit::Vector< T >::reserve(size_t k)
 {
-  if (capacity_ >= cap)
+  if (capacity_ >= k)
   {
     return;
   }
-  T * d = new T[cap];
+  T * d = new T[k];
 
   try
   {
@@ -324,7 +327,7 @@ void topit::Vector< T >::reserve(size_t k)
   }
   delete[] data_;
   data_ = d;
-  capacity_ = cap;
+  capacity_ = k;
 }
 
 template< class T >
@@ -367,7 +370,7 @@ topit::Vector< T >::Vector(Vector< T > && rhs) noexcept :
 }
 
 template< class T >
-topit::Vector< T > & topit::Vector<T>::operator=(Vector< T > &&) noexcept
+topit::Vector< T > & topit::Vector<T>::operator=(Vector< T > && rhs) noexcept
 {
   Vector< T > cpy(std::move(rhs));
   swap(cpy);
@@ -412,7 +415,7 @@ void topit::Vector< T >::popFront()
 }
 
 template< class T >
-void topit::Vector< T >::pushFront(const T &)
+void topit::Vector< T >::pushFront(const T & val)
 {
   Vector< T > cpy(val.getSize() + 1);
 
@@ -489,12 +492,6 @@ template< class T >
 const T & topit::Vector< T >::operator[](size_t id) const noexcept
 {
   return data_[0];
-}
-
-template< class T >
-void topit::Vector< T >::pushBack(const T &)
-{
-  size_++;
 }
 
 template< class T >
